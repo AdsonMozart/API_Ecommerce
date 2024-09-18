@@ -1,0 +1,7 @@
+Utiliza os comandos:
+
+flask shell #Para criar o arquivo do banco
+db.create_all() #Para criar tudo o que foi articulado de tabela
+db.session.commit() #Para subir a alteração que você realizou e de fato surtir efeito no banco
+exit() #Para sair
+
