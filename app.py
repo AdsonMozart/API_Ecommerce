@@ -1,7 +1,7 @@
 #Importação
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_cors import CORS # Biblioteca Utilizada para importar suas rotas para o SWAGGER e testar
+from flask import Flask, request, jsonify #Importação do Flask em si, do "request", para que aceite e lide com entradas no formato .json; e "jsonify" que é usado para converter dados Python (como dicionários e listas) em JSON, que é um formato comum de resposta para APIs web.
+from flask_sqlalchemy import SQLAlchemy #Extensão do Flask para integração com o banco de dados, nesse caso, SQLite
+from flask_cors import CORS #Para permitir o uso de CORS (Cross-Origin Resource Sharing), útil para testar APIs em diferentes domínios, nesse caso, ele importou todas as rotas da aplicação para o Swagger
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user #Biblioteca importada para utilizar todas as ferramentas de rotas de login, autenticação e chave-secreta da aplicação
 
 
@@ -25,7 +25,6 @@ CORS(app) #Comando para importar suas rotas para o SWAGGER
 
 
 #Modelagem
-
 #User (id, username, password)
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,7 +39,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
 
-#
+#Carrinho (id, userID, productID)
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -51,7 +50,7 @@ class CartItem(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-#Rotas
+#Rota criada para logar no sistema
 @app.route('/login', methods=["POST"])
 def login():
     data = request.json
@@ -64,12 +63,14 @@ def login():
 
     return jsonify({"message": "Unauthorized. Invalid credentials"}), 401
 
+#Rota criada para deslogar do sistema
 @app.route('/logout', methods=["POST"])
 @login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logout succesfully"})        
 
+#Rota criada para adição dos produtos no sistema
 @app.route('/api/products/add', methods=["POST"])
 @login_required
 def add_product():
@@ -81,7 +82,7 @@ def add_product():
         return jsonify({"message": "Product added succesfully!"})
     return jsonify({"message": "Invalid product data"}), 400
 
-
+#Rota criada para deletar algum produto do sistema
 @app.route('/api/products/delete/<int:product_id>', methods=["DELETE"])
 @login_required
 def delete_product(product_id):
